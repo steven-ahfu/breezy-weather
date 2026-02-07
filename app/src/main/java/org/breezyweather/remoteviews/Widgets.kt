@@ -21,6 +21,7 @@ import android.text.TextPaint
 import breezyweather.domain.weather.model.Weather
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.unit.formatting.UnitWidth
+import org.breezyweather.unit.temperature.Temperature
 import org.breezyweather.unit.temperature.TemperatureUnit
 
 object Widgets {
@@ -103,27 +104,51 @@ object Widgets {
     const val MATERIAL_YOU_FORECAST_PENDING_INTENT_CODE_WEATHER = 131
     const val MATERIAL_YOU_CURRENT_PENDING_INTENT_CODE_WEATHER = 132
 
-    fun buildWidgetDayStyleText(context: Context, weather: Weather, temperatureUnit: TemperatureUnit): Array<String> {
+    private fun formatWidgetTemperature(
+        context: Context,
+        temperature: Temperature,
+        temperatureUnit: TemperatureUnit,
+        showDualTemperature: Boolean,
+    ): String {
+        val primary = temperature.formatMeasure(
+            context,
+            temperatureUnit,
+            valueWidth = UnitWidth.NARROW,
+            unitWidth = UnitWidth.NARROW
+        )
+        if (!showDualTemperature) return primary
+
+        val secondaryUnit = if (temperatureUnit == TemperatureUnit.FAHRENHEIT) {
+            TemperatureUnit.CELSIUS
+        } else {
+            TemperatureUnit.FAHRENHEIT
+        }
+        val secondary = temperature.formatMeasure(
+            context,
+            secondaryUnit,
+            valueWidth = UnitWidth.NARROW,
+            unitWidth = UnitWidth.NARROW
+        )
+        return "$primary ($secondary)"
+    }
+
+    fun buildWidgetDayStyleText(
+        context: Context,
+        weather: Weather,
+        temperatureUnit: TemperatureUnit,
+        showDualTemperature: Boolean = false,
+    ): Array<String> {
         val texts = arrayOf(
             weather.current?.weatherText ?: "",
-            weather.current?.temperature?.temperature?.formatMeasure(
-                context,
-                temperatureUnit,
-                valueWidth = UnitWidth.NARROW,
-                unitWidth = UnitWidth.NARROW
-            ) ?: "",
-            weather.today?.day?.temperature?.temperature?.formatMeasure(
-                context,
-                temperatureUnit,
-                valueWidth = UnitWidth.NARROW,
-                unitWidth = UnitWidth.NARROW
-            ) ?: "",
-            weather.today?.night?.temperature?.temperature?.formatMeasure(
-                context,
-                temperatureUnit,
-                valueWidth = UnitWidth.NARROW,
-                unitWidth = UnitWidth.NARROW
-            ) ?: ""
+            weather.current?.temperature?.temperature?.let {
+                formatWidgetTemperature(context, it, temperatureUnit, showDualTemperature)
+            } ?: "",
+            weather.today?.day?.temperature?.temperature?.let {
+                formatWidgetTemperature(context, it, temperatureUnit, showDualTemperature)
+            } ?: "",
+            weather.today?.night?.temperature?.temperature?.let {
+                formatWidgetTemperature(context, it, temperatureUnit, showDualTemperature)
+            } ?: ""
         )
         val paint = TextPaint()
         val widths = FloatArray(4)

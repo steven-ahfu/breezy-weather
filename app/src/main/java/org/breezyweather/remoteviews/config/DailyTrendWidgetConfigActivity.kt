@@ -67,6 +67,7 @@ class DailyTrendWidgetConfigActivity : AbstractWidgetConfigActivity() {
         super.initView()
         mCardStyleContainer?.visibility = View.VISIBLE
         mCardAlphaContainer?.visibility = View.VISIBLE
+        mShowDualTemperatureContainer?.visibility = View.VISIBLE
     }
 
     override fun updateWidgetView() {

@@ -97,21 +97,43 @@ fun Daily.isToday(location: Location): Boolean {
         current[Calendar.DAY_OF_YEAR] == thisDay[Calendar.DAY_OF_YEAR]
 }
 
-fun Daily.getTrendTemperature(context: Context, temperatureUnit: TemperatureUnit): String? {
+fun Daily.getTrendTemperature(
+    context: Context,
+    temperatureUnit: TemperatureUnit,
+    showDualTemperature: Boolean = false,
+): String? {
     if (day?.temperature?.temperature == null || night?.temperature?.temperature == null) {
         return null
     }
-    return day!!.temperature!!.temperature!!.formatMeasure(
+    return formatWidgetTemperature(context, day!!.temperature!!.temperature!!, temperatureUnit, showDualTemperature) +
+        "/" +
+        formatWidgetTemperature(context, night!!.temperature!!.temperature!!, temperatureUnit, showDualTemperature)
+}
+
+private fun formatWidgetTemperature(
+    context: Context,
+    temperature: Temperature,
+    temperatureUnit: TemperatureUnit,
+    showDualTemperature: Boolean,
+): String {
+    val primary = temperature.formatMeasure(
         context,
         temperatureUnit,
         valueWidth = org.breezyweather.unit.formatting.UnitWidth.NARROW,
         unitWidth = org.breezyweather.unit.formatting.UnitWidth.NARROW
-    ) +
-        "/" +
-        night!!.temperature!!.temperature!!.formatMeasure(
-            context,
-            temperatureUnit,
-            valueWidth = org.breezyweather.unit.formatting.UnitWidth.NARROW,
-            unitWidth = org.breezyweather.unit.formatting.UnitWidth.NARROW
-        )
+    )
+    if (!showDualTemperature) return primary
+
+    val secondaryUnit = if (temperatureUnit == TemperatureUnit.FAHRENHEIT) {
+        TemperatureUnit.CELSIUS
+    } else {
+        TemperatureUnit.FAHRENHEIT
+    }
+    val secondary = temperature.formatMeasure(
+        context,
+        secondaryUnit,
+        valueWidth = org.breezyweather.unit.formatting.UnitWidth.NARROW,
+        unitWidth = org.breezyweather.unit.formatting.UnitWidth.NARROW
+    )
+    return "$primary ($secondary)"
 }

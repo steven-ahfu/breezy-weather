@@ -66,6 +66,7 @@ class DayWidgetConfigActivity : AbstractWidgetConfigActivity() {
         mSubtitleDataContainer?.visibility = View.VISIBLE
         mTextColorContainer?.visibility = View.VISIBLE
         mTextSizeContainer?.visibility = View.VISIBLE
+        mShowDualTemperatureContainer?.visibility = View.VISIBLE
     }
 
     override fun updateWidgetView() {

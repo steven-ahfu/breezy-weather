@@ -63,7 +63,8 @@ object ClockDayDetailsWidgetIMP : AbstractRemoteViewsPresenter() {
             config.textColor,
             config.textSize,
             config.clockFont,
-            config.hideAlternateCalendar
+            config.hideAlternateCalendar,
+            config.showDualTemperature
         )
         AppWidgetManager.getInstance(context).updateAppWidget(
             ComponentName(context, WidgetClockDayDetailsProvider::class.java),
@@ -80,6 +81,7 @@ object ClockDayDetailsWidgetIMP : AbstractRemoteViewsPresenter() {
         textSize: Int,
         clockFont: String?,
         hideAlternateCalendar: Boolean,
+        showDualTemperature: Boolean,
     ): RemoteViews {
         val color = WidgetColor(context, cardStyle!!, textColor!!, location?.isDaylight ?: true)
         val views = RemoteViews(
@@ -162,11 +164,11 @@ object ClockDayDetailsWidgetIMP : AbstractRemoteViewsPresenter() {
         builder.append(location.getPlace(context))
         weather.current?.temperature?.temperature?.let {
             builder.append(" ").append(
-                it.formatMeasure(context, temperatureUnit, valueWidth = UnitWidth.NARROW, unitWidth = UnitWidth.NARROW)
+                formatWidgetTemperature(context, it, temperatureUnit, showDualTemperature)
             )
         }
         views.setTextViewText(R.id.widget_clock_day_subtitle, builder.toString())
-        weather.today?.getTrendTemperature(context, temperatureUnit)?.let {
+        weather.today?.getTrendTemperature(context, temperatureUnit, showDualTemperature)?.let {
             views.setTextViewText(
                 R.id.widget_clock_day_todayTemp,
                 context.getString(R.string.daily_today_short) + " " + it

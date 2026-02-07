@@ -59,7 +59,8 @@ object ClockDayWeekWidgetIMP : AbstractRemoteViewsPresenter() {
             config.textColor,
             config.textSize,
             config.clockFont,
-            config.hideAlternateCalendar
+            config.hideAlternateCalendar,
+            config.showDualTemperature
         )
         AppWidgetManager.getInstance(context).updateAppWidget(
             ComponentName(context, WidgetClockDayWeekProvider::class.java),
@@ -76,6 +77,7 @@ object ClockDayWeekWidgetIMP : AbstractRemoteViewsPresenter() {
         textSize: Int,
         clockFont: String?,
         hideAlternateCalendar: Boolean,
+        showDualTemperature: Boolean,
     ): RemoteViews {
         val color = WidgetColor(context, cardStyle!!, textColor!!, location?.isDaylight ?: true)
         val views = RemoteViews(
@@ -159,7 +161,7 @@ object ClockDayWeekWidgetIMP : AbstractRemoteViewsPresenter() {
         builder.append(location.getPlace(context))
         weather.current?.temperature?.temperature?.let {
             builder.append(" ").append(
-                it.formatMeasure(context, temperatureUnit, valueWidth = UnitWidth.NARROW, unitWidth = UnitWidth.NARROW)
+                formatWidgetTemperature(context, it, temperatureUnit, showDualTemperature)
             )
         }
         views.setTextViewText(R.id.widget_clock_day_week_subtitle, builder.toString())
@@ -205,7 +207,7 @@ object ClockDayWeekWidgetIMP : AbstractRemoteViewsPresenter() {
             } ?: views.setTextViewText(dailyId[0], null)
             views.setTextViewText(
                 dailyId[1],
-                weather.dailyForecastStartingToday.getOrNull(i)?.getTrendTemperature(context, temperatureUnit)
+                weather.dailyForecastStartingToday.getOrNull(i)?.getTrendTemperature(context, temperatureUnit, showDualTemperature)
             )
             if (weekIconDaytime) {
                 weather.dailyForecastStartingToday.getOrNull(i)?.day?.weatherCode?.let {

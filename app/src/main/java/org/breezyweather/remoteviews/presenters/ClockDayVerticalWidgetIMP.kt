@@ -72,7 +72,8 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
             config.hideSubtitle,
             config.subtitleData,
             config.clockFont,
-            pollenIndexSource
+            pollenIndexSource,
+            config.showDualTemperature
         )
         AppWidgetManager.getInstance(context).updateAppWidget(
             ComponentName(context, WidgetClockDayVerticalProvider::class.java),
@@ -92,6 +93,7 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
         subtitleData: String?,
         clockFont: String?,
         pollenIndexSource: PollenIndexSource?,
+        showDualTemperature: Boolean,
     ): RemoteViews {
         val color = WidgetColor(context, cardStyle!!, textColor!!, location?.isDaylight ?: true)
         val settings = SettingsManager.getInstance(context)
@@ -108,7 +110,8 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
             hideSubtitle,
             subtitleData,
             temperatureUnit,
-            pollenIndexSource
+            pollenIndexSource,
+            showDualTemperature
         )
         if (color.showCard) {
             views.setImageViewResource(R.id.widget_clock_day_card, getCardBackgroundId(color))
@@ -130,6 +133,7 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
         subtitleData: String?,
         temperatureUnit: TemperatureUnit,
         pollenIndexSource: PollenIndexSource?,
+        showDualTemperature: Boolean,
     ): RemoteViews {
         val views = RemoteViews(
             context.packageName,
@@ -287,15 +291,15 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
         views.apply {
             setTextViewText(
                 R.id.widget_clock_day_title,
-                getTitleText(context, location, viewStyle, temperatureUnit)
+                getTitleText(context, location, viewStyle, temperatureUnit, showDualTemperature)
             )
             setTextViewText(
                 R.id.widget_clock_day_subtitle,
-                getSubtitleText(context, weather, viewStyle, temperatureUnit)
+                getSubtitleText(context, weather, viewStyle, temperatureUnit, showDualTemperature)
             )
             setTextViewText(
                 R.id.widget_clock_day_time,
-                getTimeText(context, location, viewStyle, subtitleData, temperatureUnit, pollenIndexSource)
+                getTimeText(context, location, viewStyle, subtitleData, temperatureUnit, pollenIndexSource, showDualTemperature)
             )
         }
 
@@ -457,10 +461,11 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
         location: Location,
         viewStyle: String?,
         temperatureUnit: TemperatureUnit,
+        showDualTemperature: Boolean,
     ): String? {
         val weather = location.weather ?: return null
         return when (viewStyle) {
-            "rectangle" -> Widgets.buildWidgetDayStyleText(context, weather, temperatureUnit)[0]
+            "rectangle" -> Widgets.buildWidgetDayStyleText(context, weather, temperatureUnit, showDualTemperature)[0]
             "symmetry" -> {
                 val stringBuilder = StringBuilder()
                 stringBuilder.append(location.getPlace(context))
@@ -513,9 +518,10 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
         weather: Weather,
         viewStyle: String?,
         temperatureUnit: TemperatureUnit,
+        showDualTemperature: Boolean,
     ): String? {
         return when (viewStyle) {
-            "rectangle" -> Widgets.buildWidgetDayStyleText(context, weather, temperatureUnit)[1]
+            "rectangle" -> Widgets.buildWidgetDayStyleText(context, weather, temperatureUnit, showDualTemperature)[1]
             "symmetry" -> weather.current?.let { current ->
                 val stringBuilder = StringBuilder()
                 if (!current.weatherText.isNullOrEmpty()) {
@@ -528,11 +534,11 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
                     if (stringBuilder.toString().isNotEmpty()) {
                         stringBuilder.append(" ")
                     }
-                    stringBuilder.append(weather.today!!.getTrendTemperature(context, temperatureUnit))
+                    stringBuilder.append(weather.today!!.getTrendTemperature(context, temperatureUnit, showDualTemperature))
                 }
                 stringBuilder.toString()
             }
-            "tile", "temp" -> weather.today?.getTrendTemperature(context, temperatureUnit)
+            "tile", "temp" -> weather.today?.getTrendTemperature(context, temperatureUnit, showDualTemperature)
             "mini" -> weather.current?.temperature?.temperature?.formatMeasure(
                 context,
                 temperatureUnit,
@@ -550,6 +556,7 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
         subtitleData: String?,
         temperatureUnit: TemperatureUnit,
         pollenIndexSource: PollenIndexSource?,
+        showDualTemperature: Boolean,
     ): String? {
         val weather = location.weather ?: return null
         return when (subtitleData) {
