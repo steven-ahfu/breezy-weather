@@ -20,6 +20,7 @@
     <string name="key_text_color" translatable="false">text_color</string>
     <string name="key_text_size" translatable="false">text_size</string>
     <string name="key_clock_font" translatable="false">clock_font</string>
+    <string name="key_show_dual_temperature" translatable="false">show_dual_temperature</string>
     <!-- Alternate calendar, keep the old name for compatibility reasons -->
     <string name="key_hide_alternate_calendar" translatable="false">hide_lunar</string>
     <string name="key_align_end" translatable="false">align_end</string>

@@ -69,6 +69,7 @@ class ClockDayWeekWidgetConfigActivity : AbstractWidgetConfigActivity() {
         mCardAlphaContainer?.visibility = View.VISIBLE
         mTextColorContainer?.visibility = View.VISIBLE
         mTextSizeContainer?.visibility = View.VISIBLE
+        mShowDualTemperatureContainer?.visibility = View.VISIBLE
         mClockFontContainer?.visibility = View.VISIBLE
         mHideAlternateCalendarContainer?.visibility = isHideAlternateCalendarContainerVisible
     }

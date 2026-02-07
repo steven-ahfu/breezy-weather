@@ -71,6 +71,7 @@ abstract class AbstractRemoteViewsPresenter {
         var clockFont: String? = null
         var hideAlternateCalendar = false
         var alignEnd = false
+        var showDualTemperature = false
     }
 
     class WidgetColor(val context: Context, cardStyle: String, textColor: String, dayTime: Boolean) {
@@ -176,6 +177,10 @@ abstract class AbstractRemoteViewsPresenter {
             )
             widgetConfig.alignEnd = configStore.getBoolean(
                 context.getString(R.string.key_align_end),
+                false
+            )
+            widgetConfig.showDualTemperature = configStore.getBoolean(
+                context.getString(R.string.key_show_dual_temperature),
                 false
             )
             return widgetConfig

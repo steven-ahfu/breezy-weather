@@ -93,6 +93,7 @@ abstract class AbstractWidgetConfigActivity : BreezyActivity() {
     protected var mClockFontContainer: RelativeLayout? = null
     protected var mHideAlternateCalendarContainer: RelativeLayout? = null
     protected var mAlignEndContainer: RelativeLayout? = null
+    protected var mShowDualTemperatureContainer: RelativeLayout? = null
     private var mBottomSheetBehavior: BottomSheetBehavior<*>? = null
     private var mBottomSheetScrollView: NestedScrollView? = null
     private var mSubtitleInputLayout: TextInputLayout? = null
@@ -119,6 +120,7 @@ abstract class AbstractWidgetConfigActivity : BreezyActivity() {
     protected var clockFontValues: Array<String> = emptyArray()
     protected var hideAlternateCalendar = false
     protected var alignEnd = false
+    protected var showDualTemperature = false
     private var mLastBackPressedTime: Long = -1
 
     // Workaround to properly resize layout and keep text input field visible when IME is open
@@ -298,6 +300,7 @@ abstract class AbstractWidgetConfigActivity : BreezyActivity() {
             hideAlternateCalendar
         )
         alignEnd = config.getBoolean(getString(R.string.key_align_end), alignEnd)
+        showDualTemperature = config.getBoolean(getString(R.string.key_show_dual_temperature), showDualTemperature)
     }
 
     @SuppressLint("UseSwitchCompatOrMaterialCode")
@@ -448,6 +451,15 @@ abstract class AbstractWidgetConfigActivity : BreezyActivity() {
             isChecked = alignEnd
         }
 
+        mShowDualTemperatureContainer =
+            findViewById<RelativeLayout>(R.id.activity_widget_config_showDualTemperatureContainer).apply {
+                visibility = View.GONE
+            }
+        findViewById<Switch>(R.id.activity_widget_config_showDualTemperatureSwitch).apply {
+            setOnCheckedChangeListener(ShowDualTemperatureSwitchCheckListener())
+            isChecked = showDualTemperature
+        }
+
         val doneButton = findViewById<Button>(R.id.activity_widget_config_doneButton)
         doneButton.setOnClickListener {
             ConfigStore(this, configStoreName!!)
@@ -462,6 +474,7 @@ abstract class AbstractWidgetConfigActivity : BreezyActivity() {
                 .putString(getString(R.string.key_clock_font), clockFontValueNow)
                 .putBoolean(getString(R.string.key_hide_alternate_calendar), hideAlternateCalendar)
                 .putBoolean(getString(R.string.key_align_end), alignEnd)
+                .putBoolean(getString(R.string.key_show_dual_temperature), showDualTemperature)
                 .apply()
             val intent = intent
             val extras = intent.extras
@@ -720,6 +733,13 @@ abstract class AbstractWidgetConfigActivity : BreezyActivity() {
     private inner class AlignEndSwitchCheckListener : CompoundButton.OnCheckedChangeListener {
         override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
             alignEnd = isChecked
+            updateHostView()
+        }
+    }
+
+    private inner class ShowDualTemperatureSwitchCheckListener : CompoundButton.OnCheckedChangeListener {
+        override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+            showDualTemperature = isChecked
             updateHostView()
         }
     }
